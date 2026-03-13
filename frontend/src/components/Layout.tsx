@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 
 const navItems = [
   { path: '/', label: '📊 Dashboard' },
@@ -10,6 +11,14 @@ const navItems = [
 ];
 
 const Layout = () => {
+  const navigate = useNavigate();
+  const user = authService.getCurrentUser();
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/login');
+  };
+
   return (
     <div className="flex h-screen bg-gray-900">
       {/* Sidebar */}
@@ -41,7 +50,16 @@ const Layout = () => {
         </nav>
 
         <div className="p-4 border-t border-gray-700">
-          <button className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+          {user && (
+            <div className="mb-3 px-4">
+              <p className="text-sm font-medium text-white">{user.username}</p>
+              <p className="text-xs text-gray-400">{user.role}</p>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+          >
             🚪 Logout
           </button>
         </div>
