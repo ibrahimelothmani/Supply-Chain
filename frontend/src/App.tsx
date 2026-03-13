@@ -1,38 +1,33 @@
-import { useState } from 'react'
-import './App.css'
-import type { User } from './models/User'
-
-
-const BASE_URL = "http://localhost:8080/api/users"
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import ProductsPage from './pages/ProductsPage';
+import InventoryPage from './pages/InventoryPage';
+import WarehousesPage from './pages/WarehousesPage';
+import SuppliersPage from './pages/SuppliersPage';
+import StockMovementsPage from './pages/StockMovementsPage';
+import './index.css';
 
 function App() {
-
-  const [users, setUsers] = useState<User[]>([])
-
-  const getUsers = async () => {
-    try {
-      const response = await fetch(BASE_URL)
-      const data = await response.json()
-      setUsers(data)
-    } catch (error) {
-      console.error("Error fetching users:", error)
-    }
-  }
-
   return (
-    <>
-    <h1>GET ALL USERS</h1>
-    <button onClick={getUsers}>Get Users</button>
-    <ul>
-      {users.map((user) => (
-        <li key={user.id}>
-          {user.name} ({user.email})
-        </li>
-      ))}
-    </ul>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected routes with layout */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/inventory" element={<InventoryPage />} />
+          <Route path="/warehouses" element={<WarehousesPage />} />
+          <Route path="/suppliers" element={<SuppliersPage />} />
+          <Route path="/stock-movements" element={<StockMovementsPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
