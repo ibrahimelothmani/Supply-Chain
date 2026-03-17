@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ghcr.io/${{ github.repository_owner }}/inventory-backend:latest
+        image: ghcr.io/ibrahimelothmani/inventory-backend:744fb512b6de21424d8f54d5f20910e1339b9146
         ports:
         - containerPort: 8080
         env:
