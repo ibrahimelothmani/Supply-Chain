@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/ibrahimelothmani/inventory-frontend:744fb512b6de21424d8f54d5f20910e1339b9146
+        image: ghcr.io/ibrahimelothmani/inventory-frontend:29589a16d1b55d6c7b3cb0e48bfd3e87ce21aa91
         ports:
         - containerPort: 80
