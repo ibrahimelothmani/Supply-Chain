@@ -1,21 +1,16 @@
 namespace: supplychain
-
 replicaCount:
   backend: 2
   frontend: 2
-
 image:
   repository: ghcr.io/ibrahimelothmani
-  backendTag: main
-  frontendTag: main
-
+  backendTag: 07dc59997037e60148e41ccbf34022bc73e492e2
+  frontendTag: 07dc59997037e60148e41ccbf34022bc73e492e2
 vault:
   enabled: false
   secretPath: secret/data/supplychain/backend
-
 ingress:
   host: supplychain.local
-
 database:
   dbName: inventory_db
   username: postgres
