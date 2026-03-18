@@ -4,8 +4,8 @@ replicaCount:
   frontend: 2
 image:
   repository: ghcr.io/ibrahimelothmani
-  backendTag: 07dc59997037e60148e41ccbf34022bc73e492e2
-  frontendTag: 07dc59997037e60148e41ccbf34022bc73e492e2
+  backendTag: f84560bd0c5ee113d65559088c489c2573964ab0
+  frontendTag: f84560bd0c5ee113d65559088c489c2573964ab0
 vault:
   enabled: false
   secretPath: secret/data/supplychain/backend
