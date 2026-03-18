@@ -1,0 +1,23 @@
+namespace: supplychain
+
+replicaCount:
+  backend: 2
+  frontend: 2
+
+image:
+  repository: ghcr.io/ibrahimelothmani
+  backendTag: main
+  frontendTag: main
+
+vault:
+  enabled: false
+  secretPath: secret/data/supplychain/backend
+
+ingress:
+  host: supplychain.local
+
+database:
+  dbName: inventory_db
+  username: postgres
+  # Insecure default, meant to be overridden by Vault later
+  password: postgres

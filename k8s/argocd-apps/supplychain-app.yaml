@@ -7,8 +7,11 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/ibrahimelothmani/Supply-Chain.git'
-    path: k8s
+    path: charts/supplychain
     targetRevision: master
+    helm:
+      valueFiles:
+        - values.yaml
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: supplychain

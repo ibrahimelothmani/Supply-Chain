@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.backend }}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+      {{- if .Values.vault.enabled }}
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'supplychain-backend'
+        vault.hashicorp.com/agent-inject-secret-secrets.env: '{{ .Values.vault.secretPath }}'
+        # Templates the Vault secret into standard environment variables that Spring Boot can read
+        vault.hashicorp.com/agent-inject-template-secrets.env: |
+          {{`{{- with secret "`}}{{ .Values.vault.secretPath }}{{`" -}}
+          export SPRING_DATASOURCE_PASSWORD="{{ .Data.data.DB_PASSWORD }}"
+          export JWT_SECRET="{{ .Data.data.JWT_SECRET }}"
+          {{- end }}`}}
+      {{- end }}
+    spec:
+      serviceAccountName: supplychain-backend
+      containers:
+      - name: backend
+        image: "{{ .Values.image.repository }}/inventory-backend:{{ .Values.image.backendTag }}"
+        {{- if .Values.vault.enabled }}
+        command: ["/bin/sh", "-c"]
+        args: ["source /vault/secrets/secrets.env && java -jar app.jar"]
+        {{- end }}
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres.supplychain.svc.cluster.local:5432/{{ .Values.database.dbName }}
+        - name: SPRING_DATASOURCE_USERNAME
+          value: {{ .Values.database.username }}
+        {{- if not .Values.vault.enabled }}
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: {{ .Values.database.password }}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: backend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: supplychain-backend
+  namespace: {{ .Values.namespace }}

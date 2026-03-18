@@ -31,15 +31,21 @@ jobs:
           docker push ghcr.io/$REPO_OWNER/inventory-backend:${{ github.sha }}
           docker push ghcr.io/$REPO_OWNER/inventory-frontend:${{ github.sha }}
 
-      - name: Update K8s manifests
+      - name: Update Helm Chart Values
         run: |
+          # Install yq to manipulate YAML safely
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod a+x /usr/local/bin/yq
+          
           REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           
-          sed -i "s|image: ghcr.io/.*/inventory-backend:.*|image: ghcr.io/${REPO_OWNER}/inventory-backend:${{ github.sha }}|g" k8s/backend/deployment.yaml
-          sed -i "s|image: ghcr.io/.*/inventory-frontend:.*|image: ghcr.io/${REPO_OWNER}/inventory-frontend:${{ github.sha }}|g" k8s/frontend/deployment.yaml
+          # Update the Helm values.yaml with the newly built image tags
+          yq e -i ".image.backendTag = \"${{ github.sha }}\"" charts/supplychain/values.yaml
+          yq e -i ".image.frontendTag = \"${{ github.sha }}\"" charts/supplychain/values.yaml
+          yq e -i ".image.repository = \"ghcr.io/${REPO_OWNER}\"" charts/supplychain/values.yaml
           
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add k8s/backend/deployment.yaml k8s/frontend/deployment.yaml
-          git commit -m "chore(cd): update image tags to ${{ github.sha }}" || echo "No changes to commit"
+          git add charts/supplychain/values.yaml
+          git commit -m "chore(cd): update helm chart image tags to ${{ github.sha }}" || echo "No changes to commit"
           git push

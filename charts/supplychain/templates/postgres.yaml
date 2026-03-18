@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: supplychain
+  namespace: {{ .Values.namespace }}
 spec:
   serviceName: postgres
   replicas: 1
@@ -21,11 +21,11 @@ spec:
         - containerPort: 5432
         env:
         - name: POSTGRES_DB
-          value: inventory_db
+          value: {{ .Values.database.dbName }}
         - name: POSTGRES_USER
-          value: postgres
+          value: {{ .Values.database.username }}
         - name: POSTGRES_PASSWORD
-          value: postgres
+          value: {{ .Values.database.password }}
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
@@ -37,3 +37,15 @@ spec:
       resources:
         requests:
           storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres

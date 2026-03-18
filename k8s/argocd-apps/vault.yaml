@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://helm.releases.hashicorp.com'
+    chart: vault
+    targetRevision: 0.27.0
+    helm:
+      values: |
+        server:
+          # Run Vault in "dev" mode for development/testing ease.
+          # WARNING: DO NOT USE DEV MODE IN REAL PRODUCTION!
+          # Dev mode runs purely in memory and automatically unseals itself.
+          dev:
+            enabled: true
+          # Enable the Vault UI
+          ui:
+            enabled: true
+            serviceType: "ClusterIP"
+        injector:
+          # Enable the Vault Agent Sidecar Injector webhook
+          enabled: true
+          # Fail if the secret cannot be injected (fail-safe security)
+          failurePolicy: Fail
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: supplychain
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
